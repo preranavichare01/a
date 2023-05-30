@@ -1,0 +1,798 @@
+﻿/* dfs and bfs*/
+
+class Graph:
+def __init__(self):
+self.adjacency_list = {}
+
+def add_edge(self, u, v):
+if u not in self.adjacency_list:
+self.adjacency_list[u] = []
+if v not in self.adjacency_list:
+self.adjacency_list[v] = []
+
+self.adjacency_list[u].append(v)
+self.adjacency_list[v].append(u)
+
+def dfs_recursive(self, vertex, visited):
+visited[vertex] = True
+print(vertex, end=" ")
+
+neighbors = self.adjacency_list[vertex]
+for neighbor in neighbors:
+if not visited[neighbor]:
+self.dfs_recursive(neighbor, visited)
+
+def dfs(self, start_vertex):
+visited = {vertex: False for vertex in self.adjacency_list}
+self.dfs_recursive(start_vertex, visited)
+
+def bfs(self, start_vertex):
+visited = {vertex: False for vertex in self.adjacency_list}
+queue = [start_vertex]
+visited[start_vertex] = True
+
+while queue:
+vertex = queue.pop(0)
+print(vertex, end=" ")
+
+neighbors = self.adjacency_list[vertex]
+for neighbor in neighbors:
+if not visited[neighbor]:
+queue.append(neighbor)
+visited[neighbor] = True
+
+
+# Example usage
+
+graph = Graph()
+
+# Get the number of vertices and edges from the user
+num_vertices = int(input("Enter the number of vertices: "))
+num_edges = int(input("Enter the number of edges: "))
+
+# Get the edges from the user and add them to the graph
+print("Enter the edges (u v) in the graph:")
+for _ in range(num_edges):
+u, v = map(int, input().split())
+graph.add_edge(u, v)
+
+# Get the starting vertex from the user
+start_vertex = int(input("Enter the starting vertex: "))
+
+# Perform DFS starting from the specified vertex
+print("Depth-First Search (DFS):")
+graph.dfs(start_vertex)
+print()
+
+# Perform BFS starting from the specified vertex
+print("Breadth-First Search (BFS):")
+graph.bfs(start_vertex)
+print()
+
+
+
+
+/***A* ***/
+
+
+class Node:
+def __init__(self, state, parent=None, g_cost=float('inf'), h_cost=0):
+self.state = state
+self.parent = parent
+self.g_cost = g_cost
+self.h_cost = h_cost
+
+def __lt__(self, other):
+return (self.g_cost + self.h_cost) < (other.g_cost + other.h_cost)
+
+
+def get_path(node):
+path = []
+current_node = node
+while current_node:
+path.append(current_node.state)
+current_node = current_node.parent
+return path[::-1]
+
+
+def astar_search(initial_state, goal_state, get_neighbors_fn, heuristic_fn):
+open_list = []
+closed_list = set()
+
+start_node = Node(initial_state, None, 0, heuristic_fn(initial_state))
+open_list.append(start_node)
+
+while open_list:
+open_list.sort()
+current_node = open_list.pop(0)
+
+if current_node.state == goal_state:
+return get_path(current_node)
+
+closed_list.add(current_node.state)
+
+neighbors = get_neighbors_fn(current_node.state)
+for neighbor in neighbors:
+if neighbor in closed_list:
+continue
+
+g_cost = current_node.g_cost + 1  # Assuming each move cost is 1
+h_cost = heuristic_fn(neighbor)
+neighbor_node = Node(neighbor, current_node, g_cost, h_cost)
+
+in_open_list = False
+for open_node in open_list:
+if open_node.state == neighbor_node.state:
+in_open_list = True
+if neighbor_node.g_cost < open_node.g_cost:
+open_node.parent = current_node
+open_node.g_cost = neighbor_node.g_cost
+break
+
+if not in_open_list:
+open_list.append(neighbor_node)
+
+return None
+
+
+# Example usage
+
+def get_neighbors(state):
+x, y = state
+neighbors = []
+
+# Define the possible movements: up, down, left, right
+movements = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+for dx, dy in movements:
+nx, ny = x + dx, y + dy
+# Check if the new position is within the grid bounds
+if 0 <= nx < grid_width and 0 <= ny < grid_height:
+# Check if the new position is not an obstacle
+if (nx, ny) not in obstacles:
+neighbors.append((nx, ny))
+
+return neighbors
+
+
+def heuristic(state):
+x, y = state
+goal_x, goal_y = goal_state
+# Calculate the Manhattan distance as the heuristic
+return abs(x - goal_x) + abs(y - goal_y)
+
+
+# Example input for a 2D grid-based game search problem
+
+# Define the grid size
+grid_width = 5
+grid_height = 5
+
+# Define the initial and goal states
+initial_state = (0, 0)  # Starting position
+goal_state = (4, 4)  # Goal position
+
+# Define the obstacles in the grid (if any)
+obstacles = [(1, 1), (2, 2), (3, 3)]  # List of obstacle positions
+
+path = astar_search(initial_state, goal_state, get_neighbors, heuristic)
+if path:
+print("Path found:", path)
+else:
+print("No path found.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def selection_sort(arr):
+n = len(arr)
+
+for i in range(n):
+min_index = i
+for j in range(i+1, n):
+if arr[j] < arr[min_index]:
+min_index = j
+
+arr[i], arr[min_index] = arr[min_index], arr[i]
+
+return arr
+
+# User Input
+nums = list(map(int, input("Enter the numbers to sort (space-separated): ").split()))
+
+print("Sorted Array:")
+sorted_nums = selection_sort(nums)
+print(sorted_nums)
+
+
+#Minimum Spanning Tree:
+
+class Graph:
+def __init__(self, vertices):
+self.V = vertices
+self.graph = []
+
+def add_edge(self, u, v, w):
+self.graph.append([u, v, w])
+
+def find(self, parent, i):
+if parent[i] == i:
+return i
+return self.find(parent, parent[i])
+
+def union(self, parent, rank, x, y):
+xroot = self.find(parent, x)
+yroot = self.find(parent, y)
+
+if rank[xroot] < rank[yroot]:
+parent[xroot] = yroot
+elif rank[xroot] > rank[yroot]:
+parent[yroot] = xroot
+else:
+parent[yroot] = xroot
+rank[xroot] += 1
+
+def kruskal_mst(self):
+result = []
+i = 0
+e = 0
+self.graph = sorted(self.graph, key=lambda item: item[2])
+parent = []
+rank = []
+
+for node in range(self.V):
+parent.append(node)
+rank.append(0)
+
+while e < self.V - 1:
+u, v, w = self.graph[i]
+i += 1
+x = self.find(parent, u)
+y = self.find(parent, v)
+
+if x != y:
+e += 1
+result.append([u, v, w])
+self.union(parent, rank, x, y)
+
+print("Minimum Spanning Tree:")
+for u, v, w in result:
+print(f"{u} - {v}: {w}")
+num_vertices = int(input("Enter the number of vertices: "))
+graph = Graph(num_vertices)
+
+num_edges = int(input("Enter the number of edges: "))
+print("Enter the edges (u v w) and their weights:")
+for _ in range(num_edges):
+u, v, w = map(int, input().split())
+graph.add_edge(u, v, w)
+
+graph.kruskal_mst()
+
+
+
+
+#III. Single-Source Shortest Path Problem:
+import sys
+
+
+class Graph:
+def __init__(self, vertices):
+self.V = vertices
+self.graph = [[0 for _ in range(vertices)] for _ in range(vertices)]
+
+def add_edge(self, u, v, w):
+self.graph[u][v] = w
+self.graph[v][u] = w
+
+def find_min_distance(self, dist, spt_set):
+min_distance = sys.maxsize
+min_index = -1
+
+for v in range(self.V):
+if dist[v] < min_distance and not spt_set[v]:
+min_distance = dist[v]
+min_index = v
+
+return min_index
+
+def print_solution(self, dist):
+print("Vertex\tDistance from Source")
+for v in range(self.V):
+print(f"{v}\t{dist[v]}")
+
+def dijkstra_sssp(self, src):
+dist = [sys.maxsize] * self.V
+dist[src] = 0
+spt_set = [False] * self.V
+
+for _ in range(self.V):
+u = self.find_min_distance(dist, spt_set)
+spt_set[u] = True
+
+for v in range(self.V):
+if (
+not spt_set[v]
+and self.graph[u][v] != 0
+and dist[u] != sys.maxsize
+and dist[u] + self.graph[u][v] < dist[v]
+):
+dist[v] = dist[u] + self.graph[u][v]
+
+self.print_solution(dist)
+
+
+num_vertices = int(input("Enter the number of vertices: "))
+graph = Graph(num_vertices)
+
+num_edges = int(input("Enter the number of edges: "))
+print("Enter the edges (u v w) and their weights:")
+for _ in range(num_edges):
+u, v, w = map(int, input().split())
+graph.add_edge(u, v, w)
+
+start_vertex = int(input("Enter the starting vertex: "))
+
+print("Single-Source Shortest Path:")
+graph.dijkstra_sssp(start_vertex)
+
+
+
+
+
+
+
+
+# 4.Job Scheduling Problem:
+def job_scheduling(job_list):
+n = len(job_list)
+job_list.sort(key=lambda x: x[1])  # Sort jobs by finish time
+
+result = []
+result.append(job_list[0])
+prev_finish_time = job_list[0][1]
+
+for i in range(1, n):
+start_time, finish_time = job_list[i]
+if start_time >= prev_finish_time:
+result.append(job_list[i])
+prev_finish_time = finish_time
+
+return result
+
+
+# User Input
+num_jobs = int(input("Enter the number of jobs: "))
+job_list = []
+
+print("Enter the start and finish times of the jobs (start_time finish_time):")
+for _ in range(num_jobs):
+start_time, finish_time = map(int, input().split())
+job_list.append((start_time, finish_time))
+
+print("Scheduled Jobs:")
+scheduled_jobs = job_scheduling(job_list)
+for job in scheduled_jobs:
+print(job)
+
+
+
+
+V. Prim's Minimal Spanning Tree Algorithm:
+
+
+
+class Graph:
+def __init__(self, vertices):
+self.V = vertices
+self.graph = [[0 for _ in range(vertices)] for _ in range(vertices)]
+
+def add_edge(self, u, v, w):
+self.graph[u][v] = w
+self.graph[v][u] = w
+
+def find_min_key(self, key, mst_set):
+min_key = float("inf")
+min_index = -1
+
+for v in range(self.V):
+if key[v] < min_key and not mst_set[v]:
+min_key = key[v]
+min_index = v
+
+return min_index
+
+def print_mst(self, parent):
+print("Edge\tWeight")
+for i in range(1, self.V):
+print(f"{parent[i]} - {i}\t{self.graph[i][parent[i]]}")
+
+def prim_mst(self):
+key = [float("inf")] * self.V
+parent = [None] * self.V
+key[0] = 0
+mst_set = [False] * self.V
+
+parent[0] = -1
+
+for _ in range(self.V):
+u = self.find_min_key(key, mst_set)
+mst_set[u] = True
+
+for v in range(self.V):
+if (
+self.graph[u][v] != 0
+and not mst_set[v]
+and self.graph[u][v] < key[v]
+):
+key[v] = self.graph[u][v]
+parent[v] = u
+
+self.print_mst(parent)
+
+
+# User Input
+num_vertices = int(input("Enter the number of vertices: "))
+graph = Graph(num_vertices)
+
+num_edges = int(input("Enter the number of edges: "))
+print("Enter the edges (u v w) and their weights:")
+for _ in range(num_edges):
+u, v, w = map(int, input().split())
+graph.add_edge(u, v, w)
+
+print("Minimum Spanning Tree:")
+graph.prim_mst()
+
+
+#VI. Kruskal's Minimal Spanning Tree Algorithm:
+
+
+
+
+class Graph:
+def __init__(self, vertices):
+self.V = vertices
+self.graph = []
+
+def add_edge(self, u, v, w):
+self.graph.append((u, v, w))
+
+def find(self, parent, i):
+if parent[i] == i:
+return i
+return self.find(parent, parent[i])
+
+def union(self, parent, rank, x, y):
+xroot = self.find(parent, x)
+yroot = self.find(parent, y)
+
+if rank[xroot] < rank[yroot]:
+parent[xroot] = yroot
+elif rank[xroot] > rank[yroot]:
+parent[yroot] = xroot
+else:
+parent[yroot] = xroot
+rank[xroot] += 1
+
+def kruskal_mst(self):
+result = []
+i = 0
+e = 0
+self.graph = sorted(self.graph, key=lambda item: item[2])
+parent = []
+rank = []
+
+for node in range(self.V):
+parent.append(node)
+rank.append(0)
+
+while e < self.V - 1:
+u, v, w = self.graph[i]
+i += 1
+x = self.find(parent, u)
+y = self.find(parent, v)
+
+if x != y:
+e += 1
+result.append((u, v, w))
+self.union(parent, rank, x, y)
+
+print("Minimum Spanning Tree:")
+for u, v, w in result:
+print(f"{u} - {v}: {w}")
+
+
+# User Input
+num_vertices = int(input("Enter the number of vertices: "))
+graph = Graph(num_vertices)
+
+num_edges = int(input("Enter the number of edges: "))
+print("Enter the edges (u v w) and their weights:")
+for _ in range(num_edges):
+u, v, w = map(int, input().split())
+graph.add_edge(u, v, w)
+
+graph.kruskal_mst()
+
+
+
+
+VII. Dijkstra's Minimal Spanning Tree Algorithm:
+
+
+class Graph:
+def __init__(self, vertices):
+self.V = vertices
+self.graph = [[0 for _ in range(vertices)] for _ in range(vertices)]
+
+def add_edge(self, u, v, w):
+self.graph[u][v] = w
+self.graph[v][u] = w
+
+def find_min_distance(self, dist, spt_set):
+min_distance = float("inf")
+min_index = -1
+
+for v in range(self.V):
+if dist[v] < min_distance and not spt_set[v]:
+min_distance = dist[v]
+min_index = v
+
+return min_index
+
+def print_solution(self, dist):
+print("Vertex\tDistance from Source")
+for v in range(self.V):
+print(f"{v}\t{dist[v]}")
+
+def dijkstra_mst(self, src):
+dist = [float("inf")] * self.V
+dist[src] = 0
+spt_set = [False] * self.V
+
+for _ in range(self.V):
+u = self.find_min_distance(dist, spt_set)
+spt_set[u] = True
+
+for v in range(self.V):
+if (
+not spt_set[v]
+and self.graph[u][v] != 0
+and dist[u] != float("inf")
+and dist[u] + self.graph[u][v] < dist[v]
+):
+dist[v] = dist[u] + self.graph[u][v]
+
+self.print_solution(dist)
+
+
+# User Input
+num_vertices = int(input("Enter the number of vertices: "))
+graph = Graph(num_vertices)
+
+num_edges = int(input("Enter the number of edges: "))
+print("Enter the edges (u v w) and their weights:")
+for _ in range(num_edges):
+u, v, w = map(int, input().split())
+graph.add_edge(u, v, w)
+
+start_vertex = int(input("Enter the starting vertex: "))
+
+print("Minimal Spanning Tree:")
+graph.dijkstra_mst(start_vertex)
+
+
+
+
+
+
+
+
+
+
+
+/***4**/
+class NQueens:
+def __init__(self, n):
+self.n = n
+self.board = [[0 for _ in range(n)] for _ in range(n)]
+
+def is_safe(self, row, col):
+# Check if a queen can be placed at the given position
+
+# Check row on the left side
+for i in range(col):
+if self.board[row][i] == 1:
+return False
+
+# Check upper diagonal on the left side
+i = row
+j = col
+while i >= 0 and j >= 0:
+if self.board[i][j] == 1:
+return False
+i -= 1
+j -= 1
+
+# Check lower diagonal on the left side
+i = row
+j = col
+while i < self.n and j >= 0:
+if self.board[i][j] == 1:
+return False
+i += 1
+j -= 1
+
+return True
+
+def solve_nqueens(self, col):
+# Base case: If all queens are placed
+if col >= self.n:
+return True
+
+# Try placing a queen in each row of the current column
+for row in range(self.n):
+if self.is_safe(row, col):
+self.board[row][col] = 1
+
+# Recur to place the rest of the queens
+if self.solve_nqueens(col + 1):
+return True
+
+# If placing queen in (row, col) doesn't lead to a solution,
+# backtrack and remove the queen from the current position
+self.board[row][col] = 0
+
+# If no queen can be placed in the current column, return False
+return False
+
+def print_solution(self):
+for i in range(self.n):
+for j in range(self.n):
+print(self.board[i][j], end=" ")
+print()
+
+
+# User Input
+n = int(input("Enter the number of queens: "))
+
+nqueens = NQueens(n)
+
+if nqueens.solve_nqueens(0):
+print("Solution:")
+nqueens.print_solution()
+else:
+print("No solution exists for the given number of queens.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*** chatbot***/
+
+
+class Chatbot:
+def __init__(self):
+self.greetings = ["hello", "hi", "hey", "greetings"]
+self.goodbyes = ["bye", "goodbye", "see you", "take care"]
+self.questions = ["how are you?", "what's your name?", "what do you do?"]
+
+def process_input(self, user_input):
+user_input = user_input.lower()
+
+if user_input in self.greetings:
+return "Hello! How can I assist you today?"
+
+if user_input in self.goodbyes:
+return "Goodbye! Have a great day!"
+
+if any(question in user_input for question in self.questions):
+return "I'm a chatbot. I'm here to help you with any questions or concerns you may have."
+
+return "I'm sorry, I didn't understand. Can you please rephrase your question?"
+
+# Create Chatbot instance
+chatbot = Chatbot()
+
+# Start conversation
+print("Chatbot: Hello! How can I assist you today?")
+
+# Interactive conversation loop
+while True:
+user_input = input("User: ")
+
+if user_input.lower() == "exit":
+print("Chatbot: Goodbye! Have a great day!")
+break
+
+response = chatbot.process_input(user_input)
+print("Chatbot:", response)
+
+
+
+
+
+
+
+
+
+/* excpert*/
+
+
+class ExpertSystem:
+def __init__(self):
+self.questions = {
+'q1': 'Is the employee punctual and regular?',
+'q2': 'Does the employee meet deadlines?',
+'q3': 'Is the employee a team player?',
+'q4': 'Does the employee take initiative?',
+'q5': 'Does the employee have good communication skills?'
+}
+
+self.rules = {
+'r1': ['q1', 'q2', 'q3', 'q4', 'q5'],
+'r2': ['q1', 'q2', 'q3'],
+'r3': ['q2', 'q4', 'q5'],
+'r4': ['q1', 'q3', 'q5']
+}
+
+self.answers = {
+'yes': 1,
+'no': 0
+}
+
+def evaluate(self):
+score = 0
+
+for rule in self.rules:
+applicable = True
+for question in self.rules[rule]:
+answer = input(self.questions[question] + ' (yes/no): ')
+if answer.lower() not in self.answers:
+print('Invalid input. Please enter "yes" or "no".')
+applicable = False
+break
+score += self.answers[answer.lower()]
+if applicable:
+break
+
+if score >= 4:
+print('The employee has a high performance level.')
+elif score >= 2:
+print('The employee has an average performance level.')
+else:
+print('The employee has a low performance level.')
+
+
+# Create Expert System instance
+expert_system = ExpertSystem()
+
+# Start evaluation
+expert_system.evaluate()
